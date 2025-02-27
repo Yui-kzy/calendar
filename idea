@@ -65,107 +65,105 @@
     - 用Canva一起設計成果報告圖表
 
 
-第一階段：建立 GUI 與資料存儲（可並行開發）
-👤 A 負責：GUI 設計（Tkinter）
-👤 B 負責：資料處理（pandas + CSV）
+第一階段：建立前端（HTML + Flask）與後端（CSV 存儲）
+👤 A 負責：前端頁面設計（HTML + CSS + Bootstrap）
+👤 B 負責：後端 API（Flask + pandas）
 
-👤 A - GUI 設計
-✅ 目標： 建立視窗介面，讓使用者輸入課程、作業內容、考試日期等資訊。
+👤 A - 設計 HTML 頁面
+✅ 目標： 設計輸入課程的網頁，讓使用者輸入課程名稱、作業、考試日期
 📚 學習內容：
 
-Tkinter 的基本元件（Label, Entry, Button, Frame）
-版面設計（grid(), pack(), place()）
-事件處理（按鈕點擊、輸入框讀取）
+HTML 基礎結構（<form>、<table>）
+CSS + Bootstrap 美化介面
+如何用 <form> 提交資料給 Flask 後端
 🛠 A 的任務
 
-建立一個視窗，包含：
-「課程名稱」、「作業內容」、「考試日期」輸入框
+設計首頁 index.html
+表單輸入：「課程名稱」、「作業內容」、「考試日期」
 「提交」按鈕
-一個空白區域，未來用來顯示輸入的內容（暫時不存入檔案）
-當使用者輸入內容後，按下「提交」，在視窗內顯示這些資訊（但不存檔）
-👤 B - CSV 檔案存儲
-✅ 目標： 設計 CSV 檔案存儲機制，讓程式能讀取、寫入課程與作業資訊。
+設計表格顯示已輸入的課程與作業
+👤 B - 建立 Flask API
+✅ 目標： 撰寫 Flask 伺服器，處理資料存儲、讀取 CSV
 📚 學習內容：
 
+Flask 基礎（@app.route、request.form）
 pandas 讀寫 CSV
-如何新增、刪除、讀取 CSV 資料
-自動載入 CSV 並顯示資料
+JSON 格式返回前端
 🛠 B 的任務
 
-建立 tasks.csv，讓程式能夠存入使用者輸入的課程與作業內容
-撰寫 save_to_csv() 函數，讓 GUI 按下「提交」後，可以把資料存入 CSV
-撰寫 load_from_csv()，讓程式啟動時能自動載入舊資料
+建立 app.py
+@app.route('/', methods=['GET', 'POST'])：接收表單資料，存入 CSV
+@app.route('/get_tasks')：返回 JSON，提供課表資訊
+當 Flask 啟動時，自動讀取 CSV 並顯示資料
 📌 合併工作（A + B）
-當 A 完成 GUI，B 完成 CSV 處理後，兩人合併代碼：
 
-A 呼叫 B 的 save_to_csv() 來存儲資料
-A 呼叫 B 的 load_from_csv()，開啟程式時顯示舊資料
-第二階段：考試倒數功能（B 開發）、GUI 表格顯示（A 開發）
-👤 A 負責：優化 GUI，新增表格顯示已輸入的資料
-👤 B 負責：計算考試倒數天數（datetime）
+A 設計的 HTML 用 AJAX（或表單提交）發送資料 給 B 的 Flask API
+B 把 CSV 存儲的資料轉成 JSON，讓 A 用 JavaScript 抓取並顯示資料
+第二階段：考試倒數與提醒功能
+👤 A 負責：在前端顯示考試倒數天數
+👤 B 負責：Flask 計算考試倒數，並發送 IFTTT 通知
 
-👤 A - 表格顯示（Tkinter Treeview）
-✅ 目標： 讓 GUI 介面顯示所有已輸入的課程與作業
+👤 A - 前端顯示考試倒數
+✅ 目標： 讓表格中新增一欄「剩餘天數」
 📚 學習內容：
 
-使用 Treeview 在 Tkinter 內顯示表格
-設計表格欄位（課程名稱、作業內容、考試日期等）
-在 load_from_csv() 時更新表格內容
+JavaScript 處理 JSON，顯示倒數天數
+HTML <table> 更新動態數據
 🛠 A 的任務
 
-在 GUI 加入 Treeview 表格，顯示所有已輸入的課程、作業
-當按下「提交」後，更新表格內容
-撰寫 refresh_table() 函數，每次存入資料後更新表格
-👤 B - 計算考試倒數天數
-✅ 目標： 讓程式計算距離考試還有幾天，並顯示在 GUI
+在課程表格內新增一欄「倒數天數」
+AJAX 請求 /get_tasks API，更新表格數據
+👤 B - 後端計算考試倒數
+✅ 目標： 用 datetime 計算考試剩餘天數，並發送通知
 📚 學習內容：
 
-datetime 讀取考試日期，計算天數
-如何在 GUI 內顯示倒數結果
+datetime 處理日期
+Flask 後端計算考試倒數
+IFTTT Webhook 發送提醒
 🛠 B 的任務
 
-撰寫 calculate_days_left()，輸入考試日期，回傳剩餘天數
-在 load_from_csv() 時，自動計算每個考試的剩餘天數
+修改 /get_tasks API，讓它返回「倒數天數」
+撰寫 send_reminder()，當考試剩 1 天時，發送通知到手機
 📌 合併工作（A + B）
-當 A 完成表格顯示，B 完成倒數天數計算後，兩人合併代碼：
 
-A 讓 GUI 表格加入一欄顯示「剩餘天數」
-B 的 calculate_days_left() 計算完天數後，A 在表格內更新顯示
-第三階段：圖表分析（B 開發）、自動提醒（A 開發）
-👤 A 負責：設計自動提醒功能（IFTTT Webhook）
-👤 B 負責：用 matplotlib 繪製學習時間分配圓餅圖
+B 的 /get_tasks API 計算倒數後，A 在網頁表格中顯示
+當倒數 <= 1 天，B 的 Flask 會發送 IFTTT 通知
+第三階段：視覺化（圓餅圖分析）
+👤 A 負責：用 JavaScript 前端顯示圖表（Chart.js）
+👤 B 負責：Flask 後端計算學習時間分配，回傳數據
 
-👤 A - 自動提醒功能
-✅ 目標： 設計自動通知系統，當作業或考試快到期時發送通知到手機
+👤 A - 用 Chart.js 顯示圓餅圖
+✅ 目標： 用 Chart.js 繪製學習時間圓餅圖
 📚 學習內容：
 
-註冊 IFTTT，建立 Webhook
-requests 發送 Webhook 請求
-設定提醒條件（如剩 1 天發送通知）
+JavaScript 繪製圓餅圖（Chart.js）
+用 AJAX 請求 Flask API，獲取數據
 🛠 A 的任務
 
-設定 IFTTT Webhook 服務
-撰寫 send_reminder()，當考試或作業剩 1 天時發送通知
-在 GUI 加入「開啟提醒」按鈕，讓使用者選擇是否要收到提醒
-👤 B - 圓餅圖分析
-✅ 目標： 讓程式讀取已輸入的學習時數，並生成圓餅圖
+在網頁加一個「生成圖表」按鈕
+AJAX 請求 /get_chart_data API，取得學習時間數據
+用 Chart.js 繪製圓餅圖
+👤 B - Flask 計算學習時間
+✅ 目標： 從 CSV 讀取數據，統計各科學習時間
 📚 學習內容：
 
-matplotlib 繪製圓餅圖
-pandas 讀取 CSV 數據，轉換成可視化圖表
-Tkinter 按鈕觸發 matplotlib 顯示
+pandas 讀取並統計 CSV 資料
+Flask 傳回 JSON 格式數據
 🛠 B 的任務
 
-撰寫 generate_pie_chart()，讀取學習時數並畫出圓餅圖
-在 GUI 加入「生成圖表」按鈕，按下後顯示圖表
+撰寫 /get_chart_data API，回傳各科目學習時間
+計算每科目的學習時數（假設 1 堂課 50 分鐘）
 📌 合併工作（A + B）
-當 A 完成自動提醒，B 完成圖表分析後，兩人合併代碼：
 
-A 設計一個「提醒設定」按鈕，B 設計「生成圖表」按鈕，最終讓 UI 整合
-A 讓 send_reminder() 在 GUI 內執行，B 讓 generate_pie_chart() 也能在 GUI 內運行
-第四階段：最終測試與優化
-👤 A 負責： 美化 GUI，確保所有按鈕與介面運作正常
-👤 B 負責： 測試所有功能，找出錯誤，寫出錯誤處理機制
+A 透過 AJAX 取得 /get_chart_data，用 Chart.js 顯示圖表
+第四階段：測試與優化
+👤 A 負責：網頁設計美化（Bootstrap）
+👤 B 負責：錯誤處理與 Flask 部署（Heroku / Railway）
 
-A 加入錯誤訊息顯示，例如「未輸入課程時不能提交」
-B 撰寫 try-except，確保 CSV 讀取錯誤時不會崩潰
+A 調整 UI，讓課表顯示更美觀
+B 加入錯誤處理（try-except），避免 Flask 崩潰
+B 嘗試部署到雲端（Heroku 或 Railway），讓手機也能使用
+這樣 Flask 版本的協作方式更靈活
+✅ 可以多人遠端協作（不像 Tkinter 只能本地跑）
+✅ 可以透過手機或電腦瀏覽器使用
+✅ 可以部署到雲端，長期運行提醒功能
