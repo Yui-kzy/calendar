@@ -1,7 +1,7 @@
 import sqlite3
 
 # 連接 SQLite（如果沒這個資料庫會自動建立）
-conn = sqlite3.connect("notes.db")
+conn = sqlite3.connect("day.db")
 cursor = conn.cursor()
 
 # 建立記事表格（如果不存在）
