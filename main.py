@@ -1,7 +1,11 @@
 import sqlite3
+import datetime
 from flask import Flask, render_template, request,redirect
 from notes import get_notes
 app = Flask(__name__)
+
+
+
 @app.route('/', methods=['GET', 'POST'])
 def note():
     if request.method == "POST":
@@ -22,5 +26,22 @@ def delete_note(note_id):
     conn.close()
     return redirect("/")
 
+@app.route('/time', methods=['GET', 'POST'])
+def time():
+    today = datetime.date.today()
+    days = None
+    if request.method == "POST":
+        year = request.form.get("year")
+        month = request.form.get("month")
+        day = request.form.get("day")
+        if year and month and day and year.isdigit() and month.isdigit() and day.isdigit():
+            try:
+                test_day = datetime.date(int(year), int(month), int(day))
+                days = (test_day - today).days
+                if days < 0:
+                    days = 0
+            except ValueError:
+                days = 0
+    return render_template("time.html", days=days)
 if __name__ == '__main__':
     app.run(debug=True)

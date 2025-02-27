@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>時間計算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            width: 50%;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+        }
+        a {
+            color: red;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>時間計算器</h1>
+        <form method="POST">
+            <input type="number" name="year" placeholder="輸入年份" required>
+            <input type="number" name="month" placeholder="輸入月份" required>
+            <input type="number" name="day" placeholder="輸入日期" required>
+            <button type="submit">新增</button>
+        </form>
+        <ul>
+            {% for time in times %}
+                <li>
+                    <span>{{ time.year }}/{{ time.month }}/{{ time.day }}</span>
+                    <a href="/delete/{{ time.id }}">刪除</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if days is not none %}
+        <h2>距離現在還有：{{ days }}</h2>
+        {% endif %}
+    </div>
+</body>
