@@ -20,7 +20,7 @@ def delete_note(note_id):
     cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
     conn.commit()
     conn.close()
-    return redirect("/note")
+    return redirect("/")
 
 if __name__ == '__main__':
     app.run(debug=True)
