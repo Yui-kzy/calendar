@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import sqlite3
 import os
 import datetime
+from main import get_exam_data
 
 load_dotenv()
 token = os.getenv("DISCORD_BOT_TOKEN1")
@@ -41,14 +42,17 @@ async def add_schedule(interaction: discord.Interaction, subject: str, date: str
     conn.close()
     await interaction.response.send_message(f"已新增課表: {subject} 在 {date}")
 
-
 # 新增考試指令
 @bot.tree.command(name="add_exam", description="新增考試")
 async def add_exam(interaction: discord.Interaction, subject: str, date: str):
     user_id = interaction.user.id
     try:
         # 確保日期格式正確
-        datetime.datetime.strptime(date, "%Y-%m-%d")
+        exam_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+        today = datetime.date.today()
+        if exam_date < today:
+            await interaction.response.send_message("日期已過期，請輸入未來的日期")
+            return
     except ValueError:
         await interaction.response.send_message("日期格式錯誤，請使用 YYYY-MM-DD 格式")
         return
@@ -60,16 +64,11 @@ async def add_exam(interaction: discord.Interaction, subject: str, date: str):
     conn.close()
     await interaction.response.send_message(f"已新增考試: {subject} 在 {date}")
 
-
 # 查詢考試剩餘時間指令
 @bot.tree.command(name="exam_countdown", description="查詢考試剩餘時間")
 async def exam_countdown(interaction: discord.Interaction):
     user_id = interaction.user.id
-    conn = sqlite3.connect("day.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT subject, date FROM exams WHERE user_id = ?", (user_id,))
-    exams = cursor.fetchall()
-    conn.close()
+    exams = get_exam_data(user_id)  # 使用 main.py 中的函數來獲取考試資料
 
     today = datetime.date.today()
     response = "考試倒數:\n"
@@ -97,6 +96,8 @@ async def check_exams():
         if days_left == 1:
             user = await bot.fetch_user(user_id)
             await user.send(f"提醒: 明天有 {subject} 考試!")
+
+bot.run(token)
 
 
 bot.run(token)
