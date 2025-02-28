@@ -3,19 +3,7 @@ import datetime
 from flask import Flask, render_template, request,redirect
 from notes import get_notes
 app = Flask(__name__)
-def init_db():
-    conn = sqlite3.connect("day.db")
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS time_events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            date TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
-init_db()
+
 
 @app.route('/note', methods=['GET', 'POST'])
 def note():
