@@ -17,7 +17,7 @@ def init_db():
     conn.close()
 init_db()
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/note', methods=['GET', 'POST'])
 def note():
     if request.method == "POST":
         note = request.form.get("note")
@@ -37,7 +37,7 @@ def delete_note(note_id):
     conn.close()
     return redirect("/")
 
-@app.route('/time', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def time():
     today = datetime.date.today()
     days = None
@@ -66,9 +66,13 @@ def time():
     conn = sqlite3.connect("day.db") 
     cursor = conn.cursor()
     cursor.execute("SELECT title, date FROM time_events ORDER BY date ASC")
-    events = cursor.fetchall()
+    events = []
+    for title, date_str in cursor.fetchall():
+        event_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+        days = (event_date - today).days
+        events.append((title, date_str, days))
     conn.close()
 
-    return render_template("time.html", days=days, events=events)
+    return render_template("time.html", events=events)
 if __name__ == '__main__':
     app.run(debug=True)

@@ -70,9 +70,9 @@
             <button type="submit">新增</button>
         </form>
         <h2>已儲存的事件</h2>
-        <ul>
-            {% for title, date in events %}
-                    <li>{{ title }} - {{ date }}  距離現在還有：{{ days }}</li>
+        <ul>          
+            {% for title, date, days_left in events %}
+                <li>{{ title }} - {{ date }} 還有 {{ days_left }} 天</li>
             {% endfor %}
         </ul>
     </div>
