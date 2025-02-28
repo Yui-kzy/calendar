@@ -57,7 +57,7 @@ def time():
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO time_events (title, date) VALUES (?, ?)", (title, test_day.strftime("%Y-%m-%d")))
                 conn.commit()
-                return redirect("/")        
+                return redirect("/")
             except ValueError:
                 pass
             finally:
@@ -70,7 +70,13 @@ def time():
     for title, date_str in cursor.fetchall():
         event_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
         days = (event_date - today).days
-        events.append((title, date_str, days))
+        if days >= 0:
+            events.append((title, date_str, days))
+        else:
+            conn = sqlite3.connect("day.db")
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM time_events WHERE date = ?", (date_str,))
+            conn.commit()
     conn.close()
 
     return render_template("time.html", events=events)

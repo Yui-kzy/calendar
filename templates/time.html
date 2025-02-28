@@ -1,35 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>時間計算器</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
             text-align: center;
+            margin: 0;
             padding: 20px;
         }
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             display: inline-block;
-            width: 50%;
+            width: 90%;
+            max-width: 500px;
         }
-        input[type="text"] {
-            width: 70%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        h1 {
+            color: #333;
+        }
+        input {
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
         }
         button {
-            padding: 10px 15px;
+            width: 100%;
+            padding: 12px;
             border: none;
             background-color: #007BFF;
             color: white;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
             transition: 0.3s;
         }
         button:hover {
@@ -38,24 +49,29 @@
         ul {
             list-style-type: none;
             padding: 0;
+            margin-top: 15px;
         }
         li {
-            background: #fff;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
+            background: #f8f9fa;
+            padding: 12px;
+            margin: 6px 0;
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
         }
-        a {
-            color: red;
-            text-decoration: none;
+        .event-title {
             font-weight: bold;
+            color: #007BFF;
         }
-        a:hover {
-            text-decoration: underline;
+        .event-date {
+            font-size: 14px;
+            color: #666;
+        }
+        .days-left {
+            font-weight: bold;
+            color: #28a745;
         }
     </style>
 </head>
@@ -72,8 +88,15 @@
         <h2>已儲存的事件</h2>
         <ul>          
             {% for title, date, days_left in events %}
-                <li>{{ title }} - {{ date }} 還有 {{ days_left }} 天</li>
+                <li>
+                    <div>
+                        <span class="event-title">{{ title }}</span><br>
+                        <span class="event-date">{{ date }}</span>
+                    </div>
+                    <span class="days-left">還有 {{ days_left }} 天</span>
+                </li>
             {% endfor %}
         </ul>
     </div>
 </body>
+</html>
