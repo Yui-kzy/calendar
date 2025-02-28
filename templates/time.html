@@ -63,21 +63,17 @@
     <div class="container">
         <h1>時間計算器</h1>
         <form method="POST">
-            <input type="number" name="year" placeholder="輸入年份" required>
+            <input type="text" name="title" placeholder="輸入標題" required>
+            <input type="number" name="year" placeholder="輸入年份" value="2025" required>
             <input type="number" name="month" placeholder="輸入月份" required>
             <input type="number" name="day" placeholder="輸入日期" required>
             <button type="submit">新增</button>
         </form>
+        <h2>已儲存的事件</h2>
         <ul>
-            {% for time in times %}
-                <li>
-                    <span>{{ time.year }}/{{ time.month }}/{{ time.day }}</span>
-                    <a href="/delete/{{ time.id }}">刪除</a>
-                </li>
+            {% for title, date in events %}
+                    <li>{{ title }} - {{ date }}  距離現在還有：{{ days }}</li>
             {% endfor %}
         </ul>
-        {% if days is not none %}
-        <h2>距離現在還有：{{ days }}</h2>
-        {% endif %}
     </div>
 </body>
