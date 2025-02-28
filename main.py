@@ -57,7 +57,7 @@ def time():
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO time_events (title, date) VALUES (?, ?)", (title, test_day.strftime("%Y-%m-%d")))
                 conn.commit()
-                return redirect("/time")        
+                return redirect("/")        
             except ValueError:
                 pass
             finally:
