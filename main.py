@@ -4,7 +4,13 @@ from flask import Flask, render_template, request,redirect
 from notes import get_notes
 app = Flask(__name__)
 
-
+def get_exam_data(user_id):
+    conn = sqlite3.connect("day.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM exams WHERE user_id = ?", (user_id,))
+    exams = cursor.fetchall()
+    conn.close()
+    return exams
 @app.route('/note', methods=['GET', 'POST'])
 def note():
     if request.method == "POST":
