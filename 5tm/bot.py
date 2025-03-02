@@ -68,8 +68,11 @@ async def add_exam(interaction: discord.Interaction, subject: str, date: str):
 @bot.tree.command(name="exam_countdown", description="查詢考試剩餘時間")
 async def exam_countdown(interaction: discord.Interaction):
     user_id = interaction.user.id
-    exams = get_exam_data(user_id)  # 使用 main.py 中的函數來獲取考試資料
-
+    conn = sqlite3.connect("day.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT subject, date FROM exams WHERE user_id = ?", (user_id,))
+    exams = cursor.fetchall()
+    conn.close()
     today = datetime.date.today()
     response = "考試倒數:\n"
     for subject, date_str in exams:

@@ -4,13 +4,6 @@ from flask import Flask, render_template, request,redirect
 from notes import get_notes
 app = Flask(__name__)
 
-def get_exam_data(user_id):
-    conn = sqlite3.connect("day.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM exams WHERE user_id = ?", (user_id,))
-    exams = cursor.fetchall()
-    conn.close()
-    return exams
 @app.route('/note', methods=['GET', 'POST'])
 def note():
     if request.method == "POST":
@@ -59,13 +52,13 @@ def time():
             conn = sqlite3.connect("day.db")
     conn = sqlite3.connect("day.db") 
     cursor = conn.cursor()
-    cursor.execute("SELECT title, date FROM time_events ORDER BY date ASC")
+    cursor.execute("SELECT id, title, date FROM time_events ORDER BY date ASC")
     events = []
-    for title, date_str in cursor.fetchall():
+    for time_events_id, title, date_str in cursor.fetchall():
         event_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
         days = (event_date - today).days
         if days >= 0:
-            events.append((title, date_str, days))
+            events.append((title, date_str, days, time_events_id))
         else:
             conn = sqlite3.connect("day.db")
             cursor = conn.cursor()
@@ -74,5 +67,14 @@ def time():
     conn.close()
 
     return render_template("time.html", events=events)
+
+@app.route("/delete/<int:time_events_id>", methods=['GET', 'POST'])
+def delete(time_events_id):
+    conn = sqlite3.connect("day.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM time_events WHERE id = ?", (time_events_id,))
+    conn.commit()
+    conn.close()
+    return redirect("/")
 if __name__ == '__main__':
     app.run(debug=True)
