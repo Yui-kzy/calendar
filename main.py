@@ -1,31 +1,53 @@
 import sqlite3
 import datetime
-from flask import Flask, render_template, request,redirect
-from notes import get_notes
+import os
+from flask import Flask, render_template, request, redirect, session, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
-
-@app.route('/note', methods=['GET', 'POST'])
-def note():
+app.secret_key = os.urandom(24)
+@app.route("/sign", methods=['GET', 'POST'])
+def sign():
     if request.method == "POST":
-        note = request.form.get("note")
-        if note:
-            conn = sqlite3.connect("notes.db")
+        user_id = request.form.get("user_id")
+        password = request.form.get("password")
+        if user_id and password:
+            hashed_password = generate_password_hash(password)
+            conn = sqlite3.connect("day.db")
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO notes (content) VALUES (?)", (note,))
-            conn.commit()
-            conn.close()
-    return render_template("index.html", notes=get_notes())
-@app.route("/note/delete/<int:note_id>", methods=['GET', 'POST'])
-def delete_note(note_id):
-    conn = sqlite3.connect("notes.db")
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
-    conn.commit()
-    conn.close()
-    return redirect("/")
+            try:
+                cursor.execute("INSERT INTO users (user_id, password) VALUES (?, ?)", (user_id, hashed_password))
+                conn.commit()
+            except sqlite3.IntegrityError:
+                return "這個帳號已被註冊！"
+            finally:
+                conn.close()
+            return redirect("/") 
+    return render_template("sign.html")
 
-@app.route('/', methods=['GET', 'POST'])
-def time():
+@app.route("/", methods=['GET', 'POST'])
+def login():
+    if request.method == "POST":
+        user_id = request.form.get("user_id")
+        password = request.form.get("password")
+
+        conn = sqlite3.connect("day.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT password FROM users WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        conn.close()
+
+        if result and check_password_hash(result[0], password):
+            session["user_id"] = user_id
+            return redirect(f"/{user_id}")          
+        else:
+            return "帳號或密碼錯誤！"
+
+    return render_template("login.html")
+@app.route('/<string:user_id>', methods=['GET', 'POST'])
+def time(user_id):
+    if "user_id" not in session or session["user_id"] != user_id:
+        return redirect(url_for("login")) 
+    
     today = datetime.date.today()
     days = None
     if request.method == "POST":
@@ -42,17 +64,15 @@ def time():
                     
                 conn = sqlite3.connect("day.db")
                 cursor = conn.cursor()
-                cursor.execute("INSERT INTO time_events (title, date) VALUES (?, ?)", (title, test_day.strftime("%Y-%m-%d")))
+                cursor.execute("INSERT INTO time_events (user_id,title, date) VALUES (?,?, ?)", (user_id,title, test_day.strftime("%Y-%m-%d")))
                 conn.commit()
-                return redirect("/")
+                return redirect(f"/{user_id}")
             except ValueError:
                 pass
-            finally:
-                conn.close() 
-            conn = sqlite3.connect("day.db")
+           
     conn = sqlite3.connect("day.db") 
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, date FROM time_events ORDER BY date ASC")
+    cursor.execute("SELECT id, title, date FROM time_events WHERE user_id = ? ORDER BY date ASC", (user_id,))
     events = []
     for time_events_id, title, date_str in cursor.fetchall():
         event_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -66,15 +86,18 @@ def time():
             conn.commit()
     conn.close()
 
-    return render_template("time.html", events=events)
-
-@app.route("/delete/<int:time_events_id>", methods=['GET', 'POST'])
-def delete(time_events_id):
+    return render_template("time.html", events=events,user_id=user_id)
+@app.route("/delete/<int:time_events_id>/<user_id>", methods=['POST'])
+def delete(time_events_id, user_id):
     conn = sqlite3.connect("day.db")
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM time_events WHERE id = ?", (time_events_id,))
+    cursor.execute("DELETE FROM time_events WHERE id = ? AND user_id = ?", (time_events_id, user_id))
     conn.commit()
     conn.close()
-    return redirect("/")
+    return redirect(f"/{user_id}")
+@app.route("/logout")
+def logout():
+    session.pop("user_id", None)
+    return redirect(url_for("login"))
 if __name__ == '__main__':
     app.run(debug=True)

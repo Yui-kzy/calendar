@@ -1,16 +1,25 @@
 import sqlite3
 
-# 連接 SQLite（如果沒這個資料庫會自動建立）
-conn = sqlite3.connect("day.db")
-cursor = conn.cursor()
+def init_db():
+    conn = sqlite3.connect("day.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS time_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            title TEXT NOT NULL,
+            date TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-# 建立記事表格（如果不存在）
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS notes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    content TEXT NOT NULL
-)
-''')
-
-conn.commit()
-conn.close()
+init_db()
