@@ -1,8 +1,4 @@
-nano requirements.txtnano requirements.txtnano requirements.txtnano requirements.txtnano requirements.txttaiohappyeyeballs==2.4.6
-aiohttp==3.11.13taiohappyeyeballs==2.4.6
-aiohttp==3.11.13taiohappyeyeballs==2.4.6
-aiohttp==3.11.13taiohappyeyeballs==2.4.6
-aiohttp==3.11.13aiohappyeyeballs==2.4.6
+aiohappyeyeballs==2.4.6
 aiohttp==3.11.13
 aiosignal==1.3.2
 attrs==23.2.0
