@@ -185,7 +185,7 @@
             {% for title, date, days_left ,time_events_id in events %}
                 <li>
                     <div>
-                        <span class="event-title">{{ title ｜ safe }}</span><br>
+                        <span class="event-title">{{ title | safe }}</span><br>
                         <span class="event-date">{{ date }}</span>
                     </div>
                     <span class="days-left">還有 {{ days_left }} 天</span>
