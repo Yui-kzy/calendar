@@ -41,8 +41,8 @@ def login():
             return redirect(f"/{user_id}")          
         else:
             return "帳號或密碼錯誤！"
-
     return render_template("login.html")
+
 @app.route('/<string:user_id>', methods=['GET', 'POST'])
 def time(user_id):
     if "user_id" not in session or session["user_id"] != user_id:
@@ -58,10 +58,6 @@ def time(user_id):
         if title and year and month and day and year.isdigit() and month.isdigit() and day.isdigit():
             try:
                 test_day = datetime.date(int(year), int(month), int(day))
-                days = (test_day - today).days
-                if days < 0:
-                    days = 0
-                    
                 conn = sqlite3.connect("day.db")
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO time_events (user_id,title, date) VALUES (?,?, ?)", (user_id,title, test_day.strftime("%Y-%m-%d")))
@@ -87,6 +83,7 @@ def time(user_id):
     conn.close()
 
     return render_template("time.html", events=events,user_id=user_id)
+
 @app.route("/delete/<int:time_events_id>/<user_id>", methods=['POST'])
 def delete(time_events_id, user_id):
     conn = sqlite3.connect("day.db")
@@ -99,6 +96,7 @@ def delete(time_events_id, user_id):
 def logout():
     session.pop("user_id", None)
     return redirect(url_for("login"))
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  
     app.run(host="0.0.0.0", port=port, debug=True)
